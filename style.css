@@ -55,7 +55,24 @@ button:hover {
 .hidden {
   display: none;
 }
+.message-container {
+  margin-top: 20px; /* Adăugarea spațiului deasupra containerului */
+}
 
+.message {
+  padding: 10px;
+  border-radius: 5px;
+}
+
+.message.error {
+  background-color: #ff4d4d;
+  color: white;
+}
+
+.message.success {
+  background-color: #4caf50;
+  color: white;
+}
 table {
   width: 100%;
   margin-top: 20px;
