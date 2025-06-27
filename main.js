@@ -51,12 +51,15 @@ document
     }
 
     // Sortează: întâi cei cu medie numerică ≥ 5, apoi restul
-    const sortedData = [
-      ...data
-        .filter((s) => typeof s.grade === "number" && s.grade >= 5)
-        .sort((a, b) => b.grade - a.grade),
-      ...data.filter((s) => typeof s.grade !== "number" || s.grade < 5),
-    ];
+    const sortedData = [...data].sort((a, b) => {
+      const isANum = typeof a.grade === "number";
+      const isBNum = typeof b.grade === "number";
+
+      if (isANum && isBNum) return b.grade - a.grade;
+      if (isANum && !isBNum) return -1;
+      if (!isANum && isBNum) return 1;
+      return 0;
+    });
 
     resultDiv.classList.remove("hidden");
     messageDiv.textContent = "Datele au fost preluate cu succes.";
