@@ -65,7 +65,7 @@ document
     });
 
     resultDiv.classList.remove("hidden");
-    messageDiv.textContent = "Datele au fost preluate cu succes.";
+    messageDiv.textContent = "Datele au fost incărcate cu succes.";
     messageDiv.classList.add("success");
     messageContainer.classList.remove("hidden");
 
