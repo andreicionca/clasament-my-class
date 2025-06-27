@@ -8,7 +8,10 @@ document
   .getElementById("mediaForm")
   .addEventListener("submit", async function (e) {
     e.preventDefault();
-    const studentId = document.getElementById("studentId").value;
+    const studentId = document
+      .getElementById("studentId")
+      .value.toLowerCase()
+      .trim();
     const resultDiv = document.getElementById("result");
     const messageContainer = document.getElementById("message-container");
     const messageDiv = document.getElementById("message");
@@ -16,14 +19,12 @@ document
       .getElementById("mediaTable")
       .querySelector("tbody");
 
-    // Curăță mesajele și tabelul
+    // Reset
     tableBody.innerHTML = "";
     messageContainer.classList.add("hidden");
     messageDiv.classList.remove("error", "success");
 
-    console.log(`Fetching data for student ID: ${studentId}`); // Adăugare log pentru debugging
-
-    // Verifică dacă ID-ul introdus există în baza de date
+    // Verificare parolă
     const { data: studentData, error: studentError } = await supabase
       .from("students")
       .select("*")
@@ -31,7 +32,6 @@ document
       .single();
 
     if (studentError || !studentData) {
-      console.error("Student not found:", studentError);
       messageDiv.textContent = "Parola incorectă. Te rugăm să încerci din nou.";
       messageDiv.classList.add("error");
       messageContainer.classList.remove("hidden");
@@ -39,56 +39,42 @@ document
       return;
     }
 
-    console.log("Student found:", studentData); // Adăugare log pentru debugging
+    // Obține toți elevii
+    const { data, error } = await supabase.from("students").select("*");
 
-    // Fetch all grades from Supabase
-    const { data, error } = await supabase
-      .from("students")
-      .select("*")
-      .order("grade", { ascending: false });
-
-    if (error) {
-      console.error("Error fetching student data:", error);
-      messageDiv.textContent =
-        "Eroare la preluarea datelor. Te rugăm să încerci din nou.";
+    if (error || !data) {
+      messageDiv.textContent = "Eroare la preluarea datelor.";
       messageDiv.classList.add("error");
       messageContainer.classList.remove("hidden");
       resultDiv.classList.add("hidden");
       return;
     }
 
-    console.log("Data fetched:", data); // Adăugare log pentru debugging
+    // Sortează: întâi cei cu medie numerică ≥ 5, apoi restul
+    const sortedData = [
+      ...data
+        .filter((s) => typeof s.grade === "number" && s.grade >= 5)
+        .sort((a, b) => b.grade - a.grade),
+      ...data.filter((s) => typeof s.grade !== "number" || s.grade < 5),
+    ];
 
-    if (data && data.length > 0) {
-      resultDiv.classList.remove("hidden");
-      messageDiv.textContent = "Datele au fost preluate cu succes.";
-      messageDiv.classList.add("success");
-      messageContainer.classList.remove("hidden");
+    resultDiv.classList.remove("hidden");
+    messageDiv.textContent = "Datele au fost preluate cu succes.";
+    messageDiv.classList.add("success");
+    messageContainer.classList.remove("hidden");
 
-      // Mută corigenții la final
-      const sortedData = [
-        ...data.filter((s) => s.grade >= 5),
-        ...data.filter((s) => s.grade < 5),
-      ];
+    sortedData.forEach((student) => {
+      const isCurrent = student.id === studentId;
+      const isCorigent = typeof student.grade !== "number" || student.grade < 5;
 
-      sortedData.forEach((student) => {
-        const isCurrentStudent = student.id === studentId;
-        const isCorigent = student.grade < 5;
-        tableBody.innerHTML += `
-      <tr class="${isCurrentStudent ? "highlight" : ""} ${
-          isCorigent ? "corigent" : ""
-        }">
-        <td>${isCurrentStudent ? student.name : ""}</td>
-        <td>${student.grade}</td>
-        <td>${student.rank ?? ""}</td>
-      </tr>
-    `;
-      });
-    } else {
-      console.log("No data found"); // Adăugare log pentru debugging
-      messageDiv.textContent = "Nu s-au găsit date.";
-      messageDiv.classList.add("error");
-      messageContainer.classList.remove("hidden");
-      resultDiv.classList.add("hidden");
-    }
+      tableBody.innerHTML += `
+        <tr class="${isCurrent ? "highlight" : ""} ${
+        isCorigent ? "corigent" : ""
+      }">
+          <td>${isCurrent ? student.name : ""}</td>
+          <td>${student.grade}</td>
+          <td>${student.rank ?? ""}</td>
+        </tr>
+      `;
+    });
   });
