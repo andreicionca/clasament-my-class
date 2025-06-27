@@ -65,15 +65,25 @@ document
       messageDiv.textContent = "Datele au fost preluate cu succes.";
       messageDiv.classList.add("success");
       messageContainer.classList.remove("hidden");
-      data.forEach((student) => {
+
+      // Mută corigenții la final
+      const sortedData = [
+        ...data.filter((s) => s.grade >= 5),
+        ...data.filter((s) => s.grade < 5),
+      ];
+
+      sortedData.forEach((student) => {
         const isCurrentStudent = student.id === studentId;
+        const isCorigent = student.grade < 5;
         tableBody.innerHTML += `
-    <tr>
-      <td>${isCurrentStudent ? student.name : ""}</td>
-      <td>${student.grade}</td>
-      <td>${student.rank ?? ""}</td>
-    </tr>
-  `;
+      <tr class="${isCurrentStudent ? "highlight" : ""} ${
+          isCorigent ? "corigent" : ""
+        }">
+        <td>${isCurrentStudent ? student.name : ""}</td>
+        <td>${student.grade}</td>
+        <td>${student.rank ?? ""}</td>
+      </tr>
+    `;
       });
     } else {
       console.log("No data found"); // Adăugare log pentru debugging
