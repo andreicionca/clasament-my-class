@@ -68,11 +68,12 @@ document
       data.forEach((student) => {
         const isCurrentStudent = student.id === studentId;
         tableBody.innerHTML += `
-                <tr>
-                    <td>${isCurrentStudent ? student.name : ""}</td>
-                    <td>${student.grade}</td>
-                </tr>
-            `;
+    <tr>
+      <td>${isCurrentStudent ? student.name : ""}</td>
+      <td>${student.grade}</td>
+      <td>${student.rank ?? ""}</td>
+    </tr>
+  `;
       });
     } else {
       console.log("No data found"); // Adăugare log pentru debugging
