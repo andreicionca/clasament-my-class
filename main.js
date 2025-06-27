@@ -33,7 +33,7 @@ document
     if (studentError || !studentData) {
       console.error("Student not found:", studentError);
       messageDiv.textContent =
-        "ID-ul introdus nu a fost găsit. Te rugăm să încerci din nou.";
+        "Id-ul introdus nu a fost găsit. Te rugăm să încerci din nou.";
       messageDiv.classList.add("error");
       messageContainer.classList.remove("hidden");
       resultDiv.classList.add("hidden");
